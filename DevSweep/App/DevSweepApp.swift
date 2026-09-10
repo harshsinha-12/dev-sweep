@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct DevSweepApp: App {
-    @StateObject private var preferences = PreferencesStore()
+    @StateObject private var preferences: PreferencesStore
     @StateObject private var store: CleanupStore
 
     init() {
