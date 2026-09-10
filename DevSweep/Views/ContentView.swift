@@ -7,11 +7,11 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            AtmosphereBackground()
+            AppBackdrop()
 
             NavigationSplitView(columnVisibility: $columnVisibility) {
                 SidebarView()
-                    .navigationSplitViewColumnWidth(min: 210, ideal: 240, max: 300)
+                    .navigationSplitViewColumnWidth(min: 220, ideal: 246, max: 280)
             } detail: {
                 ResultsView()
             }
@@ -19,28 +19,38 @@ struct ContentView: View {
         }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                GlassEffectContainer(spacing: 12) {
-                    HStack(spacing: 10) {
-                        if store.isScanning {
-                            Button("Cancel", role: .cancel) {
-                                store.cancelScan()
-                            }
-                            .buttonStyle(.glass)
-                        }
-
+                HStack(spacing: 8) {
+                    if store.isScanning {
                         Button {
-                            store.startScan()
+                            store.cancelScan()
                         } label: {
-                            Label(store.isScanning ? "Scanning…" : "Scan", systemImage: "arrow.triangle.2.circlepath")
+                            Label("Cancel", systemImage: "xmark")
                         }
-                        .buttonStyle(.glassProminent)
-                        .disabled(store.isScanning || preferences.scanRootURLs.isEmpty)
-                        .keyboardShortcut("r", modifiers: .command)
+                        .buttonStyle(.glass)
                     }
+
+                    Button {
+                        store.startScan()
+                    } label: {
+                        Label(
+                            store.isScanning ? "Scanning…" : "Scan Now",
+                            systemImage: store.isScanning
+                                ? "arrow.trianglehead.2.clockwise.rotate.90"
+                                : "sparkle.magnifyingglass"
+                        )
+                    }
+                    .buttonStyle(.glassProminent)
+                    .tint(DS.accent)
+                    .disabled(store.isScanning || preferences.scanRootURLs.isEmpty)
+                    .keyboardShortcut("r", modifiers: .command)
                 }
             }
         }
-        .searchable(text: $store.searchText, placement: .toolbar, prompt: "Search folders or projects")
+        .searchable(
+            text: $store.searchText,
+            placement: .toolbar,
+            prompt: "Search results"
+        )
         .onKeyPress(.space) {
             if let id = store.selectedCandidateID {
                 store.toggleSelection(id)
@@ -72,41 +82,6 @@ struct ContentView: View {
                 store.startScan()
             }
         }
-    }
-}
-
-struct AtmosphereBackground: View {
-    var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.93, green: 0.96, blue: 0.98),
-                    Color(red: 0.86, green: 0.91, blue: 0.96),
-                    Color(red: 0.91, green: 0.94, blue: 0.90)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-
-            Circle()
-                .fill(Color(red: 0.45, green: 0.72, blue: 0.92).opacity(0.28))
-                .frame(width: 420, height: 420)
-                .blur(radius: 50)
-                .offset(x: -280, y: -220)
-
-            Circle()
-                .fill(Color(red: 0.55, green: 0.82, blue: 0.68).opacity(0.22))
-                .frame(width: 380, height: 380)
-                .blur(radius: 60)
-                .offset(x: 320, y: 180)
-
-            Circle()
-                .fill(Color(red: 0.98, green: 0.78, blue: 0.45).opacity(0.14))
-                .frame(width: 260, height: 260)
-                .blur(radius: 40)
-                .offset(x: 160, y: -160)
-        }
-        .ignoresSafeArea()
     }
 }
 
