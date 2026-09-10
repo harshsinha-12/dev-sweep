@@ -11,7 +11,6 @@ protocol DirectoryScanning: Sendable {
 actor DirectoryScanner: DirectoryScanning {
     private let detector: any ProjectDetecting
     private let sizeCalculator: any FolderSizeCalculating
-    private let fileManager: FileManager
 
     private static let candidateNames: Set<String> = [
         "node_modules",
@@ -37,12 +36,10 @@ actor DirectoryScanner: DirectoryScanning {
 
     init(
         detector: any ProjectDetecting = ProjectDetector(),
-        sizeCalculator: any FolderSizeCalculating = FolderSizeCalculator(),
-        fileManager: FileManager = .default
+        sizeCalculator: any FolderSizeCalculating = FolderSizeCalculator()
     ) {
         self.detector = detector
         self.sizeCalculator = sizeCalculator
-        self.fileManager = fileManager
     }
 
     func scan(
@@ -92,8 +89,10 @@ actor DirectoryScanner: DirectoryScanning {
             progress(state)
         }
 
+        let fileManager = FileManager.default
+
         // Always include common Xcode DerivedData if present and not ignored.
-        let derivedData = FileManager.default.homeDirectoryForCurrentUser
+        let derivedData = fileManager.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Developer/Xcode/DerivedData", isDirectory: true)
         if fileManager.fileExists(atPath: derivedData.path),
            !ignoredPathSet.contains(derivedData.resolvingSymlinksInPath().standardizedFileURL.path),
@@ -121,6 +120,7 @@ actor DirectoryScanner: DirectoryScanning {
         var candidates: [CleanupCandidate] = []
         var directoriesChecked = 0
         var bytesDetected: Int64 = 0
+        let fileManager = FileManager.default
 
         let resourceKeys: [URLResourceKey] = [
             .isDirectoryKey,

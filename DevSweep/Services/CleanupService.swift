@@ -1,8 +1,13 @@
 import Foundation
 
+struct CleanupFailure: Sendable, Equatable {
+    let url: URL
+    let message: String
+}
+
 struct CleanupResult: Sendable, Equatable {
     var trashed: [URL]
-    var failed: [(url: URL, message: String)]
+    var failed: [CleanupFailure]
     var reclaimedBytes: Int64
 
     var isPartialFailure: Bool { !failed.isEmpty }
@@ -16,21 +21,16 @@ protocol CleanupServicing: Sendable {
 }
 
 struct CleanupService: CleanupServicing {
-    private let fileManager: FileManager
-
-    init(fileManager: FileManager = .default) {
-        self.fileManager = fileManager
-    }
-
     func moveToTrash(
         candidates: [CleanupCandidate],
         allowedRoots: [URL]
     ) async -> CleanupResult {
+        let fileManager = FileManager.default
         let derivedData = fileManager.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Developer/Xcode/DerivedData", isDirectory: true)
 
         var trashed: [URL] = []
-        var failed: [(URL, String)] = []
+        var failed: [CleanupFailure] = []
         var reclaimed: Int64 = 0
 
         for candidate in candidates {
@@ -42,11 +42,15 @@ struct CleanupService: CleanupServicing {
 
             switch validation {
             case .failure(let error):
-                failed.append((candidate.url, error.localizedDescription))
+                failed.append(CleanupFailure(url: candidate.url, message: error.localizedDescription))
             case .success(let safeURL):
-                // Re-verify name still matches the candidate we detected.
                 guard safeURL.lastPathComponent == candidate.folderName else {
-                    failed.append((candidate.url, "Folder name no longer matches the detected item."))
+                    failed.append(
+                        CleanupFailure(
+                            url: candidate.url,
+                            message: "Folder name no longer matches the detected item."
+                        )
+                    )
                     continue
                 }
 
@@ -56,7 +60,7 @@ struct CleanupService: CleanupServicing {
                     trashed.append(safeURL)
                     reclaimed += candidate.sizeBytes
                 } catch {
-                    failed.append((candidate.url, error.localizedDescription))
+                    failed.append(CleanupFailure(url: candidate.url, message: error.localizedDescription))
                 }
             }
         }

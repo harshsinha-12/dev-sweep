@@ -5,15 +5,9 @@ protocol FolderSizeCalculating: Sendable {
 }
 
 struct FolderSizeCalculator: FolderSizeCalculating {
-    private let fileManager: FileManager
-
-    init(fileManager: FileManager = .default) {
-        self.fileManager = fileManager
-    }
-
     func size(of url: URL) async -> Int64 {
         await Task.detached(priority: .utility) {
-            Self.calculateSize(of: url, fileManager: .default)
+            Self.calculateSize(of: url)
         }.value
     }
 
@@ -45,7 +39,6 @@ struct FolderSizeCalculator: FolderSizeCalculating {
                 let values = try fileURL.resourceValues(forKeys: resourceKeys)
 
                 if values.isSymbolicLink == true {
-                    // Do not follow symlinks outside the traversal tree.
                     enumerator.skipDescendants()
                     continue
                 }

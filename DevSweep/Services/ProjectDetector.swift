@@ -29,20 +29,15 @@ struct ProjectHints: Sendable, Equatable {
 }
 
 struct ProjectDetector: ProjectDetecting {
-    private let fileManager: FileManager
-
-    init(fileManager: FileManager = .default) {
-        self.fileManager = fileManager
-    }
-
     func detect(at url: URL, parentProjectHints: ProjectHints) -> DetectionMatch? {
         let name = url.lastPathComponent
         let parent = url.deletingLastPathComponent()
         let projectName = parent.lastPathComponent
+        let fileManager = FileManager.default
 
         switch name {
         case "node_modules":
-            if parentProjectHints.hasPackageJSON || fileExists("package.json", in: parent) {
+            if parentProjectHints.hasPackageJSON || fileExists("package.json", in: parent, fileManager: fileManager) {
                 return DetectionMatch(
                     category: .dependencies,
                     confidence: .safe,
@@ -58,7 +53,7 @@ struct ProjectDetector: ProjectDetecting {
             )
 
         case ".next":
-            if parentProjectHints.hasPackageJSON || fileExists("package.json", in: parent) {
+            if parentProjectHints.hasPackageJSON || fileExists("package.json", in: parent, fileManager: fileManager) {
                 return DetectionMatch(
                     category: .buildCache,
                     confidence: .safe,
@@ -74,16 +69,18 @@ struct ProjectDetector: ProjectDetecting {
             )
 
         case ".nuxt", ".turbo", ".parcel-cache", ".svelte-kit":
+            let safe = parentProjectHints.hasPackageJSON || fileExists("package.json", in: parent, fileManager: fileManager)
             return DetectionMatch(
                 category: .buildCache,
-                confidence: parentProjectHints.hasPackageJSON || fileExists("package.json", in: parent) ? .safe : .likelySafe,
+                confidence: safe ? .safe : .likelySafe,
                 reason: "JavaScript tooling cache folder (\(name))",
                 projectName: projectName
             )
 
         case "coverage":
-            if parentProjectHints.hasPackageJSON || fileExists("package.json", in: parent) ||
-                parentProjectHints.hasPythonProject {
+            if parentProjectHints.hasPackageJSON
+                || fileExists("package.json", in: parent, fileManager: fileManager)
+                || parentProjectHints.hasPythonProject {
                 return DetectionMatch(
                     category: .testCoverage,
                     confidence: .likelySafe,
@@ -94,7 +91,7 @@ struct ProjectDetector: ProjectDetecting {
             return nil
 
         case "dist", "build", "out":
-            guard hasBuildEvidence(in: parent, hints: parentProjectHints) else { return nil }
+            guard hasBuildEvidence(in: parent, hints: parentProjectHints, fileManager: fileManager) else { return nil }
             return DetectionMatch(
                 category: .buildOutput,
                 confidence: .review,
@@ -103,7 +100,7 @@ struct ProjectDetector: ProjectDetecting {
             )
 
         case ".cache":
-            guard hasBuildEvidence(in: parent, hints: parentProjectHints) else { return nil }
+            guard hasBuildEvidence(in: parent, hints: parentProjectHints, fileManager: fileManager) else { return nil }
             return DetectionMatch(
                 category: .buildCache,
                 confidence: .review,
@@ -120,7 +117,7 @@ struct ProjectDetector: ProjectDetecting {
             )
 
         case ".venv", "venv":
-            if parentProjectHints.hasPythonProject || hasPythonEvidence(in: parent) {
+            if parentProjectHints.hasPythonProject || hasPythonEvidence(in: parent, fileManager: fileManager) {
                 return DetectionMatch(
                     category: .virtualEnvironment,
                     confidence: .review,
@@ -136,7 +133,7 @@ struct ProjectDetector: ProjectDetecting {
             )
 
         case "target":
-            if parentProjectHints.hasCargoToml || fileExists("Cargo.toml", in: parent) {
+            if parentProjectHints.hasCargoToml || fileExists("Cargo.toml", in: parent, fileManager: fileManager) {
                 return DetectionMatch(
                     category: .buildOutput,
                     confidence: .safe,
@@ -160,45 +157,46 @@ struct ProjectDetector: ProjectDetecting {
     }
 
     func hints(for directory: URL) -> ProjectHints {
-        ProjectHints(
-            hasPackageJSON: fileExists("package.json", in: directory),
-            hasCargoToml: fileExists("Cargo.toml", in: directory),
-            hasPythonProject: hasPythonEvidence(in: directory),
-            hasXcodeProject: hasXcodeEvidence(in: directory),
+        let fileManager = FileManager.default
+        return ProjectHints(
+            hasPackageJSON: fileExists("package.json", in: directory, fileManager: fileManager),
+            hasCargoToml: fileExists("Cargo.toml", in: directory, fileManager: fileManager),
+            hasPythonProject: hasPythonEvidence(in: directory, fileManager: fileManager),
+            hasXcodeProject: hasXcodeEvidence(in: directory, fileManager: fileManager),
             parentName: directory.lastPathComponent
         )
     }
 
-    private func hasBuildEvidence(in parent: URL, hints: ProjectHints) -> Bool {
+    private func hasBuildEvidence(in parent: URL, hints: ProjectHints, fileManager: FileManager) -> Bool {
         if hints.hasPackageJSON || hints.hasCargoToml || hints.hasPythonProject || hints.hasXcodeProject {
             return true
         }
-        return fileExists("package.json", in: parent)
-            || fileExists("Cargo.toml", in: parent)
-            || fileExists("pyproject.toml", in: parent)
-            || fileExists("requirements.txt", in: parent)
-            || hasXcodeEvidence(in: parent)
+        return fileExists("package.json", in: parent, fileManager: fileManager)
+            || fileExists("Cargo.toml", in: parent, fileManager: fileManager)
+            || fileExists("pyproject.toml", in: parent, fileManager: fileManager)
+            || fileExists("requirements.txt", in: parent, fileManager: fileManager)
+            || hasXcodeEvidence(in: parent, fileManager: fileManager)
     }
 
-    private func hasPythonEvidence(in directory: URL) -> Bool {
-        fileExists("pyproject.toml", in: directory)
-            || fileExists("requirements.txt", in: directory)
-            || fileExists("setup.py", in: directory)
-            || containsExtension(["py"], in: directory)
+    private func hasPythonEvidence(in directory: URL, fileManager: FileManager) -> Bool {
+        fileExists("pyproject.toml", in: directory, fileManager: fileManager)
+            || fileExists("requirements.txt", in: directory, fileManager: fileManager)
+            || fileExists("setup.py", in: directory, fileManager: fileManager)
+            || containsExtension(["py"], in: directory, fileManager: fileManager)
     }
 
-    private func hasXcodeEvidence(in directory: URL) -> Bool {
+    private func hasXcodeEvidence(in directory: URL, fileManager: FileManager) -> Bool {
         guard let items = try? fileManager.contentsOfDirectory(atPath: directory.path) else {
             return false
         }
         return items.contains { $0.hasSuffix(".xcodeproj") || $0.hasSuffix(".xcworkspace") }
     }
 
-    private func fileExists(_ name: String, in directory: URL) -> Bool {
+    private func fileExists(_ name: String, in directory: URL, fileManager: FileManager) -> Bool {
         fileManager.fileExists(atPath: directory.appendingPathComponent(name).path)
     }
 
-    private func containsExtension(_ extensions: [String], in directory: URL) -> Bool {
+    private func containsExtension(_ extensions: [String], in directory: URL, fileManager: FileManager) -> Bool {
         guard let items = try? fileManager.contentsOfDirectory(atPath: directory.path) else {
             return false
         }
