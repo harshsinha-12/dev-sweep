@@ -84,9 +84,9 @@ if [[ ! -d "$VOLUME_PATH" ]]; then
 fi
 
 echo "→ Applying Finder layout"
-BG_RELIEF=""
+BG_LINE=""
 if [[ -f "$VOLUME_PATH/.background/background.png" ]]; then
-  BG_RELIEF=".background:background.png"
+  BG_LINE='set background picture of viewOptions to file ".background:background.png"'
 fi
 
 osascript <<EOF
@@ -100,24 +100,9 @@ tell application "Finder"
     set viewOptions to the icon view options of container window
     set arrangement of viewOptions to not arranged
     set icon size of viewOptions to 128
+    $BG_LINE
     set position of item "$APP_NAME.app" of container window to {160, 220}
     set position of item "Applications" of container window to {460, 220}
-EOF
-
-if [[ -n "$BG_RELIEF" ]]; then
-  osascript <<EOF
-tell application "Finder"
-  tell disk "$VOLUME_NAME"
-    set viewOptions to the icon view options of container window
-    set background picture of viewOptions to file "$BG_RELIEF"
-  end tell
-end tell
-EOF
-fi
-
-osascript <<EOF
-tell application "Finder"
-  tell disk "$VOLUME_NAME"
     update without registering applications
     delay 1
     close
