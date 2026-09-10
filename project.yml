@@ -1,0 +1,52 @@
+name: DevSweep
+options:
+  bundleIdPrefix: dev.harshsinha
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  MARKETING_VERSION: "0.1.0"
+  CURRENT_PROJECT_VERSION: "1"
+  SWIFT_VERSION: "6.0"
+  MACOSX_DEPLOYMENT_TARGET: "26.0"
+targets:
+  DevSweep:
+    type: application
+    platform: macOS
+    sources:
+      - path: DevSweep
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: dev.harshsinha.devsweep
+      PRODUCT_NAME: DevSweep
+      GENERATE_INFOPLIST_FILE: YES
+      INFOPLIST_KEY_CFBundleDisplayName: DevSweep
+      INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+      INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Harsh Sinha"
+      INFOPLIST_KEY_NSPrincipalClass: NSApplication
+      COMBINE_HIDPI_IMAGES: YES
+      ENABLE_HARDENED_RUNTIME: YES
+      CODE_SIGN_IDENTITY: "-"
+      CODE_SIGN_STYLE: Automatic
+      SWIFT_STRICT_CONCURRENCY: complete
+    scheme:
+      testTargets:
+        - DevSweepTests
+  DevSweepTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: DevSweepTests
+        excludes:
+          - "**/.DS_Store"
+    dependencies:
+      - target: DevSweep
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: dev.harshsinha.devsweep.tests
+      GENERATE_INFOPLIST_FILE: YES
+      CODE_SIGN_IDENTITY: "-"
+      CODE_SIGN_STYLE: Automatic
+      TEST_HOST: "$(BUILT_PRODUCTS_DIR)/DevSweep.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DevSweep"
+      BUNDLE_LOADER: "$(TEST_HOST)"
