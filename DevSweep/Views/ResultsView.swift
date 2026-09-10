@@ -10,7 +10,11 @@ struct ResultsView: View {
                 ScanProgressView()
                     .padding(20)
             } else if store.candidates.isEmpty {
-                EmptyStateView()
+                if store.hasCompletedScan {
+                    CleanEmptyStateView()
+                } else {
+                    EmptyStateView()
+                }
             } else {
                 resultsContent
             }
@@ -155,6 +159,44 @@ struct ResultsView: View {
         .listStyle(.inset)
         .scrollContentBackground(.hidden)
         .glassEffect(.regular, in: .rect(cornerRadius: 20))
+    }
+}
+
+struct CleanEmptyStateView: View {
+    @EnvironmentObject private var store: CleanupStore
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            VStack(spacing: 16) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(Color(red: 0.18, green: 0.67, blue: 0.45))
+                    .padding(24)
+                    .glassEffect(.regular.interactive(), in: .circle)
+
+                Text("Looking tidy")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+
+                Text("No removable developer leftovers were found in your selected folders.")
+                    .font(.system(.title3, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 480)
+
+                Button {
+                    store.startScan()
+                } label: {
+                    Label("Scan Again", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .buttonStyle(.glass)
+                .padding(.top, 4)
+            }
+            .padding(36)
+            .glassEffect(.regular, in: .rect(cornerRadius: 28))
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
