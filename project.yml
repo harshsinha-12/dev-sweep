@@ -28,9 +28,11 @@ targets:
       INFOPLIST_KEY_NSPrincipalClass: NSApplication
       COMBINE_HIDPI_IMAGES: YES
       ENABLE_HARDENED_RUNTIME: YES
+      ENABLE_APP_SANDBOX: NO
       CODE_SIGN_IDENTITY: "-"
       CODE_SIGN_STYLE: Automatic
       SWIFT_STRICT_CONCURRENCY: complete
+      ENABLE_TESTABILITY: YES
     scheme:
       testTargets:
         - DevSweepTests
@@ -50,3 +52,4 @@ targets:
       CODE_SIGN_STYLE: Automatic
       TEST_HOST: "$(BUILT_PRODUCTS_DIR)/DevSweep.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DevSweep"
       BUNDLE_LOADER: "$(TEST_HOST)"
+      GENERATE_INFOPLIST_FILE: YES
