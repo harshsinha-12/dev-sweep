@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          # Prefer the newest installed Xcode; fall back gracefully.
+          if [ -d /Applications/Xcode.app ]; then
+            sudo xcode-select -s /Applications/Xcode.app
+          fi
+          xcodebuild -version
+          sw_vers
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: deriveddata-${{ runner.os }}-${{ hashFiles('**/*.swift', 'project.yml', 'DevSweep.xcodeproj/project.pbxproj') }}
+          restore-keys: |
+            deriveddata-${{ runner.os }}-
+
+      - name: Resolve / generate project
+        run: |
+          if [ -f project.yml ]; then
+            if ! command -v xcodegen >/dev/null 2>&1; then
+              brew install xcodegen
+            fi
+            xcodegen generate
+          fi
+          test -f DevSweep.xcodeproj/project.pbxproj
+
+      - name: Build Debug
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -scheme DevSweep \
+            -project DevSweep.xcodeproj \
+            -destination 'platform=macOS' \
+            -configuration Debug \
+            -derivedDataPath "$HOME/Library/Developer/Xcode/DerivedData/DevSweep-CI" \
+            CODE_SIGNING_ALLOWED=NO \
+            build | xcpretty || xcodebuild \
+              -scheme DevSweep \
+              -project DevSweep.xcodeproj \
+              -destination 'platform=macOS' \
+              -configuration Debug \
+              -derivedDataPath "$HOME/Library/Developer/Xcode/DerivedData/DevSweep-CI" \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+
+      - name: Test
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -scheme DevSweep \
+            -project DevSweep.xcodeproj \
+            -destination 'platform=macOS' \
+            -configuration Debug \
+            -derivedDataPath "$HOME/Library/Developer/Xcode/DerivedData/DevSweep-CI" \
+            CODE_SIGNING_ALLOWED=NO \
+            test
+
+      - name: Build Release
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -scheme DevSweep \
+            -project DevSweep.xcodeproj \
+            -destination 'platform=macOS' \
+            -configuration Release \
+            -derivedDataPath "$HOME/Library/Developer/Xcode/DerivedData/DevSweep-CI" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
