@@ -5,6 +5,7 @@ import AppKit
 final class CleanupStore: ObservableObject {
     @Published private(set) var candidates: [CleanupCandidate] = []
     @Published private(set) var isScanning = false
+    @Published private(set) var hasCompletedScan = false
     @Published private(set) var scanProgress = ScanProgress.idle
     @Published private(set) var lastReclaimedBytes: Int64 = 0
     @Published private(set) var lastCleanupSummary: String?
@@ -15,7 +16,7 @@ final class CleanupStore: ObservableObject {
     @Published var selectedCandidateID: CleanupCandidate.ID?
     @Published var error: AppError?
     @Published var showCleanupConfirmation = false
-    @Published var deletionFailures: [(url: URL, message: String)] = []
+    @Published var deletionFailures: [CleanupFailure] = []
 
     let preferences: PreferencesStore
 
@@ -120,6 +121,7 @@ final class CleanupStore: ObservableObject {
                 guard !Task.isCancelled else { return }
                 candidates = results
                 selectedCandidateID = results.first?.id
+                hasCompletedScan = true
                 isScanning = false
             } catch is CancellationError {
                 isScanning = false
