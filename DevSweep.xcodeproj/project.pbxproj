@@ -16,6 +16,7 @@
 		4F2678325FEE8A308244767B /* CleanupConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F9D2835C92CC99489B9AF21 /* CleanupConfirmationView.swift */; };
 		59010289A2D6B324236664FD /* CleanupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7310049733F0AA88EAB74B23 /* CleanupService.swift */; };
 		5D9C514815056050110B2D65 /* CandidateRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C04D6B4A69797CD4D2EBF5 /* CandidateRow.swift */; };
+		75ACD406294F0400C5AC530B /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB5505DA3F3F2E9D3A8C548C /* DesignSystem.swift */; };
 		7BA6F8DD21862011E2BEE50B /* PathSafetyValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9299A3F2EA67B721C53DECE6 /* PathSafetyValidator.swift */; };
 		857B42F8A319238FE6C71CF6 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0132C4B8F5058DF411CADEA2 /* SettingsView.swift */; };
 		88C10A2FE907DD1E9A6E13C9 /* ProjectDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C12EBE2CFA291051393386 /* ProjectDetector.swift */; };
@@ -67,6 +68,7 @@
 		D13B8E0F7E2D2D8C3BAE45AD /* PreferencesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesStore.swift; sourceTree = "<group>"; };
 		F65A1AE3F97BBE8FC8777C0B /* ScanModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanModels.swift; sourceTree = "<group>"; };
 		F8C04D6B4A69797CD4D2EBF5 /* CandidateRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CandidateRow.swift; sourceTree = "<group>"; };
+		FB5505DA3F3F2E9D3A8C548C /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
 		FCFA17BD43D986BC17B1DF23 /* DevSweep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DevSweep.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -87,6 +89,7 @@
 				F8C04D6B4A69797CD4D2EBF5 /* CandidateRow.swift */,
 				8F9D2835C92CC99489B9AF21 /* CleanupConfirmationView.swift */,
 				91041D6C618826530108CF8E /* ContentView.swift */,
+				FB5505DA3F3F2E9D3A8C548C /* DesignSystem.swift */,
 				6D25E8D8C9B62996DCFA36C1 /* ResultsView.swift */,
 				4987C80DA7E33CAC9CA75543 /* ScanProgressView.swift */,
 				0132C4B8F5058DF411CADEA2 /* SettingsView.swift */,
@@ -284,6 +287,7 @@
 				59010289A2D6B324236664FD /* CleanupService.swift in Sources */,
 				48532D01CC566C951984BFC4 /* CleanupStore.swift in Sources */,
 				ACC2909D4622BCECF459F19F /* ContentView.swift in Sources */,
+				75ACD406294F0400C5AC530B /* DesignSystem.swift in Sources */,
 				0C5B33B3BBBE5E54D4D42DCE /* DevSweepApp.swift in Sources */,
 				BED0061357085EFDA31F79A9 /* DirectoryScanner.swift in Sources */,
 				9C71537BE8F8DD50D6A3E738 /* FolderSizeCalculator.swift in Sources */,

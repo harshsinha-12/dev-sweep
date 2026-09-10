@@ -19,6 +19,7 @@ struct DevSweepApp: App {
                 .frame(minWidth: 980, minHeight: 640)
         }
         .defaultSize(width: 1180, height: 760)
+        .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             CommandGroup(replacing: .newItem) {}
             CommandMenu("Scan") {
