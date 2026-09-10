@@ -41,6 +41,13 @@ struct ContentView: View {
             }
         }
         .searchable(text: $store.searchText, placement: .toolbar, prompt: "Search folders or projects")
+        .onKeyPress(.space) {
+            if let id = store.selectedCandidateID {
+                store.toggleSelection(id)
+                return .handled
+            }
+            return .ignored
+        }
         .alert(
             "Something needs attention",
             isPresented: Binding(
