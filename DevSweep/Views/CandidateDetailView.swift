@@ -132,7 +132,7 @@ struct CandidateDetailView: View {
             .padding(12)
         }
         .frame(maxHeight: .infinity)
-        .glassEffect(.regular, in: .rect(cornerRadius: DS.contentCornerRadius))
+        .panelBackground()
     }
 
     private func detailRow(title: String, value: String, icon: String) -> some View {

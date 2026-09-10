@@ -102,7 +102,7 @@ struct ResultsView: View {
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
-        .glassEffect(.regular, in: .rect(cornerRadius: DS.contentCornerRadius))
+        .panelBackground()
     }
 
     private var safeCandidateCount: Int {

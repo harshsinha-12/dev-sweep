@@ -91,7 +91,7 @@ struct SidebarView: View {
         }
         .listStyle(.sidebar)
         .scrollContentBackground(.hidden)
-        .background(.ultraThinMaterial)
+        .background(DS.canvas.opacity(0.94))
         .safeAreaInset(edge: .bottom) {
             HStack(spacing: 10) {
                 Image(systemName: "checkmark.shield.fill")

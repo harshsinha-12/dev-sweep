@@ -1,61 +1,57 @@
 import SwiftUI
 
 enum DS {
-    static let accent = Color(red: 0.10, green: 0.66, blue: 0.90)
-    static let cyan = Color(red: 0.16, green: 0.78, blue: 0.86)
-    static let mint = Color(red: 0.25, green: 0.72, blue: 0.55)
-    static let amber = Color(red: 0.82, green: 0.54, blue: 0.27)
-    static let bronze = Color(red: 0.66, green: 0.40, blue: 0.23)
-    static let coral = Color(red: 0.96, green: 0.39, blue: 0.36)
+    static let accent = Color(red: 0.08, green: 0.39, blue: 0.37)
+    static let cyan = Color(red: 0.30, green: 0.68, blue: 0.64)
+    static let mint = Color(red: 0.22, green: 0.57, blue: 0.49)
+    static let amber = Color(red: 0.72, green: 0.50, blue: 0.24)
+    static let bronze = Color(red: 0.52, green: 0.36, blue: 0.25)
+    static let coral = Color(red: 0.76, green: 0.31, blue: 0.28)
+    static let ink = Color(red: 0.105, green: 0.10, blue: 0.09)
+    static let canvas = Color(red: 0.955, green: 0.948, blue: 0.925)
+    static let surface = Color(red: 0.985, green: 0.982, blue: 0.968)
+    static let stone = Color(red: 0.935, green: 0.925, blue: 0.895)
 
     static let contentCornerRadius: CGFloat = 22
     static let compactCornerRadius: CGFloat = 13
     static let pagePadding: CGFloat = 22
 
     static var panelFill: Color {
-        Color(nsColor: .controlBackgroundColor).opacity(0.72)
+        surface.opacity(0.92)
     }
 
     static var insetFill: Color {
-        Color.primary.opacity(0.045)
+        stone.opacity(0.72)
     }
 }
 
 struct AppBackdrop: View {
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
         ZStack {
-            Color(nsColor: .windowBackgroundColor)
+            DS.canvas
 
             LinearGradient(
-                colors: colorScheme == .dark
-                    ? [
-                        Color(red: 0.075, green: 0.064, blue: 0.058),
-                        Color(red: 0.105, green: 0.082, blue: 0.067),
-                        Color(red: 0.070, green: 0.076, blue: 0.078)
-                    ]
-                    : [
-                        Color(red: 0.96, green: 0.94, blue: 0.91),
-                        Color(red: 0.94, green: 0.91, blue: 0.87),
-                        Color(red: 0.91, green: 0.92, blue: 0.91)
-                    ],
+                colors: [
+                    Color.white.opacity(0.36),
+                    Color.clear,
+                    DS.accent.opacity(0.025)
+                ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
             RadialGradient(
-                colors: [DS.bronze.opacity(colorScheme == .dark ? 0.20 : 0.14), .clear],
+                colors: [Color(red: 0.76, green: 0.57, blue: 0.39).opacity(0.08), .clear],
                 center: .topTrailing,
                 startRadius: 20,
-                endRadius: 560
+                endRadius: 620
             )
 
             RadialGradient(
-                colors: [DS.accent.opacity(colorScheme == .dark ? 0.075 : 0.08), .clear],
+                colors: [DS.accent.opacity(0.045), .clear],
                 center: .bottomTrailing,
                 startRadius: 10,
-                endRadius: 540
+                endRadius: 580
             )
         }
         .allowsHitTesting(false)
@@ -63,7 +59,6 @@ struct AppBackdrop: View {
 }
 
 struct PanelBackground: ViewModifier {
-    @Environment(\.colorScheme) private var colorScheme
     var cornerRadius: CGFloat = DS.contentCornerRadius
     var selected = false
 
@@ -74,21 +69,17 @@ struct PanelBackground: ViewModifier {
                     .fill(
                         selected
                             ? DS.accent.opacity(0.11)
-                            : (
-                                colorScheme == .dark
-                                    ? Color(red: 0.105, green: 0.095, blue: 0.087).opacity(0.82)
-                                    : Color.white.opacity(0.54)
-                            )
+                            : DS.surface.opacity(0.94)
                     )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .strokeBorder(
-                        selected ? DS.accent.opacity(0.46) : Color.white.opacity(0.10),
+                        selected ? DS.accent.opacity(0.40) : DS.ink.opacity(0.075),
                         lineWidth: selected ? 1.25 : 0.75
                     )
             )
-            .shadow(color: .black.opacity(0.06), radius: 16, y: 7)
+            .shadow(color: DS.ink.opacity(0.045), radius: 16, y: 7)
     }
 }
 

@@ -14,9 +14,20 @@ struct ContentView: View {
                     .navigationSplitViewColumnWidth(min: 220, ideal: 246, max: 280)
             } detail: {
                 ResultsView()
+                    .background(
+                        DS.surface.opacity(0.72),
+                        in: RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .strokeBorder(DS.ink.opacity(0.055))
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .padding(9)
             }
             .navigationSplitViewStyle(.balanced)
         }
+        .preferredColorScheme(.light)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 HStack(spacing: 8) {
